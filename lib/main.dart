@@ -41,6 +41,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreen extends State<HomeScreen> {
   List<bool> toggles = List<bool>.filled(25, true);
+  //List<Color> appleColor = <Color>[];
+  List<int> blues = List<int>.filled(25, 255);
 
   @override
   void initState() {
@@ -61,19 +63,24 @@ class _HomeScreen extends State<HomeScreen> {
   void buttonPress({required int buttonNumber}) {
     setState(() {
       toggles[buttonNumber] = !toggles[buttonNumber];
+      blues[buttonNumber] = toggles[buttonNumber] ? 0 : 255;
       if (buttonNumber % 5 >= 1 && buttonNumber % 5 <= 4) {
         toggles[buttonNumber - 1] = !toggles[buttonNumber - 1];
+        blues[buttonNumber-1] = toggles[buttonNumber-1] ? 0 : 255;
       }
       if (buttonNumber % 5 <= 3 && buttonNumber % 5 >= 0) {
         toggles[buttonNumber + 1] = !toggles[buttonNumber + 1];
+        blues[buttonNumber+1] = toggles[buttonNumber+1] ? 0: 255;
       }
       if (buttonNumber >= 5) {
         int belowButton = buttonNumber % 5 + 5 * ((buttonNumber ~/ 5) - 1);
         toggles[belowButton] = !toggles[belowButton];
+        blues[belowButton] = toggles[belowButton] ? 0 : 255;
       }
       if (buttonNumber <= 19) {
         int aboveButton = buttonNumber % 5 + 5 * ((buttonNumber ~/ 5) + 1);
         toggles[aboveButton] = !toggles[aboveButton];
+        blues[aboveButton] = toggles[aboveButton] ? 0 :255;
       }
     });
   }
@@ -83,11 +90,13 @@ class _HomeScreen extends State<HomeScreen> {
     List<Widget> buttons = <Widget>[];
     String winText = "";
 
+
     for (int i = 0; i < 25; i++) {
       buttons.add(Container(
           color: Colors.purple,
           padding: const EdgeInsets.all(8),
           child: PlatformElevatedButton(
+            color: Color.fromARGB(255, 0, 0, blues[i]),
             onPressed: () {
               buttonPress(buttonNumber: i);
               if(hasWon()){
@@ -106,39 +115,42 @@ class _HomeScreen extends State<HomeScreen> {
         appBar: PlatformAppBar(
           title: PlatformText('Lights Out'),
         ),
-        body: Column(
-          children: <Widget>[
-            SizedBox(
-              width: 300,
-                height: 150,
-              child: FittedBox(
-                fit: BoxFit.contain,
-                child: PlatformText("Lights out")
-              )
+        body: SafeArea(
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                    width: 300,
+                    height: 50,
+                    child: FittedBox(
+                        fit: BoxFit.contain,
+                        clipBehavior: Clip.hardEdge,
+                        child: PlatformText("Lights out")
+                    )
 
-            ),
-            PlatformText(winText),
-            Center(
-                child: SafeArea(
+                ),
+
+                PlatformText(winText),
+                Center(
                     child: GridView.count(
-                        shrinkWrap: true,
-                        crossAxisCount: 5,
-                        padding: const EdgeInsets.all(20),
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: buttons))),
-            PlatformElevatedButton(
-                material: (context, b) => MaterialElevatedButtonData(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black)),
-              child: PlatformText("Start Over"),
-              onPressed: ()=>
-              setState(() {
-                toggles = List<bool>.filled(25, true);
-                randomize();
-                winText = "";
-              })
-            )
-          ],
-        ));
-  }
+                            shrinkWrap: true,
+                            crossAxisCount: 5,
+                            padding: const EdgeInsets.all(20),
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: buttons)),
+                PlatformElevatedButton(
+                    material: (context, b) => MaterialElevatedButtonData(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black)),
+                    child: PlatformText("Start Over"),
+                    color: Colors.black,
+                    onPressed: ()=>
+                        setState(() {
+                          toggles = List<bool>.filled(25, true);
+                          randomize();
+                          winText = "";
+                        })
+                )
+              ],
+    ),
+    ));}
 }
